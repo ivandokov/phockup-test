@@ -8,7 +8,7 @@ jobs:
     name: Build on ubuntu-20.04 armv7
     steps:
       - uses: actions/checkout@v2.1.0
-      - uses: uraimo/run-on-arch-action@v2
+      - uses: uraimo/run-on-arch-action@v2.1.1
         name: Run commands
         with:
           arch: armv7

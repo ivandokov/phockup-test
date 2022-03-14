@@ -3,20 +3,35 @@ name: Deploy
 on: [push]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform:
-          - amd64
-          - armhf
-          - arm64
+  armv7_job:
+    runs-on: ubuntu-20.04
+    name: Build on ubuntu-18.04 armv7
     steps:
-      - uses: actions/checkout@v2
-      - uses: docker/setup-qemu-action@v1
-      - uses: diddlesnaps/snapcraft-multiarch-action@v1
+      - uses: actions/checkout@v2.1.0
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
         with:
-          architecture: ${{ matrix.platform }}
+          arch: armv7
+          distro: ubuntu20.04
+          run: |
+            snap install snapcraft
+            snapcraft
+
+#  build:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        platform:
+#          - amd64
+#          - armhf
+#          - arm64
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: docker/setup-qemu-action@v1
+#      - uses: diddlesnaps/snapcraft-multiarch-action@v1
+#        with:
+#          architecture: ${{ matrix.platform }}
+
 #  deploy-snap:
 #    runs-on: ubuntu-20.04
 #    strategy:

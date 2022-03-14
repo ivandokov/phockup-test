@@ -3,38 +3,52 @@ name: Deploy
 on: [push]
 
 jobs:
-  deploy-snap:
-    runs-on: ubuntu-20.04
+  build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        architecture: [ linux/amd64, linux/arm/v7 ]
+        platform:
+          - amd64
+          - armhf
+          - arm64
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - uses: docker/setup-qemu-action@v1
+      - uses: diddlesnaps/snapcraft-multiarch-action@v1
         with:
-          fetch-depth: 0
-
-      - id: snapcraft
-        name: Build Snap
-        run: |
-          echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json > /dev/null
-          sudo systemctl restart docker
-
-          docker run --rm --tty \
-            --security-opt apparmor:unconfined \
-            --cap-add SYS_ADMIN \
-            multiarch/qemu-user-static --reset -p yes
-
-          docker run --rm --tty \
-            --security-opt apparmor:unconfined \
-            --cap-add SYS_ADMIN \
-            --device /dev/fuse \
-            --volume /sys \
-            --volume /sys/fs/cgroup:/sys/fs/cgroup:ro \
-            --volume $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
-            --workdir $GITHUB_WORKSPACE \
-            --platform "${{ matrix.architecture }}" \
-            --env PLAYTEST="${{ matrix.playtest }}" \
-            diddledan/snapcraft:core20
-
-          find $GITHUB_WORKSPACE -maxdepth 1 -type f -name '*.snap' | head -n1
+          architecture: ${{ matrix.platform }}
+#  deploy-snap:
+#    runs-on: ubuntu-20.04
+#    strategy:
+#      matrix:
+#        architecture: [ linux/amd64, linux/arm/v7 ]
+#    steps:
+#      - name: Checkout the repository
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#
+#      - id: snapcraft
+#        name: Build Snap
+#        run: |
+#          echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json > /dev/null
+#          sudo systemctl restart docker
+#
+#          docker run --rm --tty \
+#            --security-opt apparmor:unconfined \
+#            --cap-add SYS_ADMIN \
+#            multiarch/qemu-user-static --reset -p yes
+#
+#          docker run --rm --tty \
+#            --security-opt apparmor:unconfined \
+#            --cap-add SYS_ADMIN \
+#            --device /dev/fuse \
+#            --volume /sys \
+#            --volume /sys/fs/cgroup:/sys/fs/cgroup:ro \
+#            --volume $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+#            --workdir $GITHUB_WORKSPACE \
+#            --platform "${{ matrix.architecture }}" \
+#            --env PLAYTEST="${{ matrix.playtest }}" \
+#            diddledan/snapcraft:core20
+#
+#          find $GITHUB_WORKSPACE -maxdepth 1 -type f -name '*.snap' | head -n1

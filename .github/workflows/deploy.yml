@@ -19,7 +19,7 @@ jobs:
 #          architecture: ${{ matrix.platform }}
 
   deploy-snap:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         architecture: [ linux/amd64, linux/arm/v7 ]
@@ -50,6 +50,6 @@ jobs:
             --workdir $GITHUB_WORKSPACE \
             --platform "${{ matrix.architecture }}" \
             --env PLAYTEST="${{ matrix.playtest }}" \
-            diddledan/snapcraft:core20
+            diddledan/snapcraft:core18
 
           find $GITHUB_WORKSPACE -maxdepth 1 -type f -name '*.snap' | head -n1
